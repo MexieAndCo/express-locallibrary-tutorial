@@ -1,0 +1,91 @@
+//- /views/bookinstance_detail.pug
+//- 2021-07-31 17:18
+//- See https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms/Create_book_form
+//-
+//- The view structure and behavior is almost the same as for the 
+//- genre_form.pug template.
+//-
+//- The main differences are in how we implement the selection-type 
+//- fields: Author and Genre.
+//-
+//- The set of genres are displayed as checkboxes, using the checked 
+//- value we set in the controller to determine whether or not the 
+//- box should be selected.
+//-    
+//- The set of authors are displayed as a single-selection 
+//- alphabetically ordered drop-down list. If the user has previously 
+//- selected a book author (i.e. when fixing invalid field 
+//- values after initial form submission, or when updating book 
+//- details) the author will be re-selected when the form is displayed. 
+//- Here we determine what author to select by comparing the id of 
+//- the current author option with the value previously entered by the 
+//- user (passed in via the book variable). This is highlighted above! 
+//-
+//- Note: If there is an error in the submitted form, then, when the 
+//- form is to be re-rendered, the new book author's id and the existing 
+//- books's authors ids are of type Schema.Types.ObjectId. So to compare 
+//- them we must convert them to strings first.
+//-
+//- Run the application, open your browser to http://localhost:3000/, 
+//- then select the Create new book link. If everything is set up 
+//- correctly, your site should look something like the following 
+//- screenshot. After you submit a valid book, it should be saved and 
+//- you'll be taken to the book detail page.
+//-
+extends layout
+
+block content
+  h2= title
+
+  //- Open /views/book_form.pug and update the section where the author 
+  //- form control is set to have the conditional code shown below.
+  form(method='POST' action='')
+    div.form-group
+      label(for='title') Title:
+      input#title.form-control(type='text', placeholder='Name of book' name='title' required='true' value=(undefined===book ? '' : book.title) )
+    div.form-group
+      label(for='author') Author:
+      select#author.form-control(type='select', placeholder='Select author' name='author' required='true' )
+        - authors.sort(function(a, b) {let textA = a.family_name.toUpperCase(); let textB = b.family_name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        for author in authors
+          if book
+            option(value=author._id selected=(author._id.toString()===book.author._id.toString() ? 'selected' : false) ) #{author.name}
+          else
+            //- The change that starts here is from
+            //- https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms/Update_Book_form
+
+            //- Handle GET form, where book.author is an object, and POST form, where it is a string.
+            option(
+              value=author._id
+              selected=(
+                author._id.toString()==book.author._id
+                || author._id.toString()==book.author
+              ) ? 'selected' : false
+            ) #{author.name}
+            //- The above change is from
+            //- https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms/Update_Book_form
+            //- (The following line is being replaced by the above code.)
+            //- option(value=author._id) #{author.name}
+            //- Note: This code change is required so that the book_form 
+            //- can be used for both creating and updating book objects 
+            //- (without this, there is an error on the GET route when 
+            //- creating a form).
+    div.form-group
+      label(for='summary') Summary:
+      textarea#summary.form-control(type='textarea', placeholder='Summary' name='summary' required='true') #{undefined===book ? '' : book.summary}
+    div.form-group
+      label(for='isbn') ISBN:
+      input#isbn.form-control(type='text', placeholder='ISBN13' name='isbn' value=(undefined===book ? '' : book.isbn) required='true')
+    div.form-group
+      label Genre:
+      div
+        for genre in genres
+          div(style='display: inline; padding-right:10px;')
+            input.checkbox-input(type='checkbox', name='genre', id=genre._id, value=genre._id, checked=genre.checked )
+            label(for=genre._id) #{genre.name}
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors
+    ul
+      for error in errors
+        li!= error.msg

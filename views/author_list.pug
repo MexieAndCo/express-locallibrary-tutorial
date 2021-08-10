@@ -1,0 +1,16 @@
+//- /views/author_list.pug
+//- 2021-07-22 21:00
+//- See https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Displaying_data/Author_list_page
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each author in author_list
+      li
+        a(href=author.url) #{author.name}
+        |  #{author.lifespan}  
+        // (#{author.date_of_birth} - #{author.date_of_death})
+    else
+      li There are no authors.

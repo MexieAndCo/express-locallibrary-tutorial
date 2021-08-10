@@ -1,0 +1,29 @@
+//- /views/bookinstance_detail.pug
+//- 2021-07-25 15:27
+//- See https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Displaying_data/BookInstance_detail_page_and_challenge
+extends layout
+
+block content
+
+  h2 ID: #{bookinstance._id}
+  
+  p #[strong Title:] 
+    a(href=bookinstance.book.url) #{bookinstance.book.title}
+  p #[strong Imprint:] #{bookinstance.imprint}
+
+  p #[strong Status:] 
+    if bookinstance.status=='Available'
+      span.text-success #{bookinstance.status}
+    else if bookinstance.status=='Maintenance'
+      span.text-danger #{bookinstance.status}
+    else
+      span.text-warning #{bookinstance.status} 
+      
+  if bookinstance.status!='Available'
+    p #[strong Due back:] #{bookinstance.due_back_formatted}
+
+  hr
+  p
+    a(href=bookinstance.url+'/delete') Delete BookInstance
+  p
+    a(href=bookinstance.url+'/update') Update BookInstance

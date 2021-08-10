@@ -1,0 +1,41 @@
+//- /views/author_detail.pug
+//- 2021-07-29 16:52
+//- See https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Displaying_data/Author_detail_page
+//-
+//- 2021-08-01 15:32
+//- Next we will add a Delete control to the Author detail view 
+//- (the detail page is a good place from which to delete a record).
+//-
+//- Note: In a full implementation the control would be made visible 
+//- only to authorized users. However at this point we haven't got an 
+//- authorization system in place!
+extends layout
+
+block content
+
+  h2 Author: #{author.name}
+  //- p #{author.date_of_birth} - #{author.date_of_death}
+  p #{author.lifespan}  
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Books
+
+    dl
+      each book in author_books
+        dt
+          a(href=book.url) #{book.title}
+        dd #{book.summary}
+
+      else
+        p This author has no books.
+
+  //- Adding the following as instructed on
+  //- https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms/Delete_author_form
+  //- (Added the update paragraph, too, since it was in the repo version
+  //- of the file.)
+  hr
+  p
+    a(href=author.url+'/delete') Delete author
+  p
+    a(href=author.url+'/update') Update author
